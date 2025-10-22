@@ -59,3 +59,18 @@ print("="*60)
 ```
 Tip: total games = workers × G.
 Workers = Threads
+
+7) **For very large totals (e.g. 100M+), prefer the tiled API:**
+```
+from gpubj.runner import run_tiled
+
+# Run ~100 million games safely on Colab’s GPU
+out = run_tiled(total_games_target=100_000_000,
+                workers=32768,
+                G=1024,
+                R=28,
+                seed=2025)
+
+for k, v in out.items():
+    print(f"{k:22}: {v}")
+```
