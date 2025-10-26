@@ -5,10 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gpu-blackjack-triton"
 version = "0.1.0"
-description = "BCG-style GPU Blackjack in Triton (no GA), with true rules, timing, and CLI."
 readme = "README.md"
-license = {text = "MIT"}
-authors = [{name="Your Name", email="you@example.com"}]
 requires-python = ">=3.9"
 dependencies = ["torch", "triton"]
 
