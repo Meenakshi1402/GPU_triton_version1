@@ -1,34 +1,30 @@
 """
-File: test_small_gpu.py
+File: test_strategy.py
 Description:
-  Unit test for verifying a small GPU run of the Blackjack Triton kernel.
-  Ensures that CUDA is available, the kernel runs without error, and
-  produces valid timing and game statistics.
+  Unit test for verifying correctness and consistency of the
+  Blackjack Basic Strategy lookup table used by the Triton kernel.
 
 """
 
 import torch
-from gpubj.runner import run_once
+from gpubj.strategy import build_basic_strategy_table
 
 
-def test_small_gpu_run():
+def test_strategy_shape():
     """
-    Run a small GPU simulation batch to verify kernel correctness and timing.
+    Validate the shape and data type of the basic strategy table.
 
     Assertions
     ----------
-    - CUDA device must be available.
-    - The number of simulated hands equals the total number of games.
-    - Both kernel and wall-clock times must be greater than zero.
+    - The table must have shape (43, 10).
+    - The dtype must be uint8 for GPU compatibility.
 
     Notes
     -----
-    This test uses a small configuration (workers=1024, G=256)
-    for fast validation on CI or local GPU environments.
+    The strategy table is used by the GPU kernel to make decisions.
+    Ensuring correct shape and dtype prevents indexing or memory errors.
     """
-    assert torch.cuda.is_available(), "No CUDA GPU detected."
-    out = run_once(workers=1024, G=256, R=28, seed=7)
+    t = build_basic_strategy_table(device="cpu")
 
-    assert out["hands"] == out["total_games"], "Mismatch between hands and games count."
-    assert out["kernel_ms"] > 0.0, "Kernel time not recorded properly."
-    assert out["wall_s"] > 0.0, "Wall-clock time not recorded properly."
+    assert t.shape == (43, 10), f"Expected shape (43,10), got {tuple(t.shape)}"
+    assert t.dtype == torch.uint8, f"Expected dtype uint8, got {t.dtype}"
